@@ -1,0 +1,9 @@
+apiVersion: v2
+name: spark-nanny
+description: A simple app to monitor spark app driver pods and restart them in case of failure
+type: application
+version: 0.1.0
+appVersion: "0.0.5"
+maintainers:
+- name: Bringg DevOps
+  email: devops@bringg.com
