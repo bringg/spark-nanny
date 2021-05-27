@@ -2,7 +2,7 @@ apiVersion: v2
 name: spark-nanny
 description: A simple app to monitor spark app driver pods and restart them in case of failure
 type: application
-version: 0.1.1
+version: 0.1.2
 appVersion: "0.0.6"
 sources:
 - https://github.com/bringg/spark-nanny

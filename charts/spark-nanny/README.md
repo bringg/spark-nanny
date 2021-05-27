@@ -6,6 +6,34 @@ A simple app to monitor spark app driver pods and restart them in case of failur
 
 - Helm >= 3
 
+## Installing the chart
+
+```shell
+# add the spark-nanny repo
+
+$ helm repo add bringg-spark-nanny https://bringg.github.io/spark-nanny
+
+$ helm install spark-nanny bringg-spark-nanny/spark-nanny
+```
+
+This will create a release of `spark-nanny` in the default namespace. To install in a different one:
+
+```shell
+$ helm install -n spark my-release bringg-spark-nanny/spark-nanny
+```
+
+Note that `helm` will fail to install if the namespace doesn't exist. Either create the namespace beforehand or pass the `--create-namespace` flag to the `helm install` command.
+
+## Uninstalling the chart
+
+To uninstall `my-release`:
+
+```shell
+$ helm uninstall my-release
+```
+
+The command removes all the Kubernetes components associated with the chart and deletes the release
+
 ## Values
 
 | Key | Type | Default | Description |

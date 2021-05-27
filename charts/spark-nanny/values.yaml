@@ -26,16 +26,16 @@ serviceAccount:
 # -- Comma separated list of spark apps to watch, e.g. spark-app1,spark-app2. Required
 sparkApps: ""
 
-# args -- List of additional args to pass, e.g.
+# -- List of additional args to pass, e.g.
 # - --interval=45
 # - --debug
 # - --dry-run
 args: []
 
-# podAnnotations -- Additional annotations to add to the pod
+# -- Additional annotations to add to the pod
 podAnnotations: {}
 
-# resources -- Pod resource requests and limits
+# -- Pod resource requests and limits
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
@@ -48,11 +48,11 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-# nodeSelector -- Node labels for pod assignment
+# -- Node labels for pod assignment
 nodeSelector: {}
 
-# tolerations -- List of node taints to tolerate
+# -- List of node taints to tolerate
 tolerations: []
 
-# affinity -- Affinity for pod assignment
+# -- Affinity for pod assignment
 affinity: {}
