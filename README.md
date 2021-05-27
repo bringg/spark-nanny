@@ -14,15 +14,18 @@ While it is possible to use pod templates to launch `spark` apps (as of `spark 3
 
 The simplest way to install `spark-nanny` is to use the provided chart:
 
-```shell
-# Requires helm3
+> Requires helm3
 
-$ helm install spark-nanny --namespace spark charts/spark-nanny --set sparkApps="spark-app1\,spark-app2"
+```shell
+# First, add the spark-nanny repo
+$ helm repo add bringg-spark-nanny https://bringg.github.io/spark-nanny
+
+$ helm install spark-nanny -namespace spark bringg-spark-nanny/spark-nanny -set sparkApps="spark-app1\,spark-app2"
 ```
 
 Note that the comma must be escaped (with `\`)
 
-See the chart's `values` file for more details and possible configuration options
+See the chart's `README` file for more details and possible configuration options
 
 ## Configuration
 
