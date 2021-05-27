@@ -22,10 +22,5 @@ install-tools: download
 	@echo "==> installing tools from tools.go..."
 	@cat tools/tools.go | grep _ | awk -F'"' '{print $$2}' | xargs -tI % go install %
 
-build-image:
-	@echo "==> building docker image..."
-	@docker build -t ${REPO}/${BINARY}:${TAG} .
-
-push-image: build-image
-	@echo "==> pushing image to docker hub"
-	@docker push ${REPO}/${BINARY}:${TAG}
+helm-docs:
+	@helm-docs -c ./charts

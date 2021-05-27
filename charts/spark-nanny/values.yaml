@@ -3,29 +3,39 @@
 # Declare variables to be passed into your templates.
 
 image:
+  # -- Image repository
   repository: bringg/spark-nanny
+  # -- Image pull policy
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
+  # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
+# -- Image pull secrets
 imagePullSecrets: []
+
+# -- String to partially override `spark-nanny.fullname` template (will maintain the release name)
 nameOverride: ""
+
+# -- String to override release name
 fullnameOverride: ""
 
 serviceAccount:
+  # -- Additional annotations to add to the service account
   annotations: {}
 
-# Comma seperated list of spark apps to watch, e.g. spark-app1,spark-app2. Required
-# sparkApps: ""
+# -- Comma separated list of spark apps to watch, e.g. spark-app1,spark-app2. Required
+sparkApps: ""
 
-# Additional args to pass, e.g.
+# args -- List of additional args to pass, e.g.
 # - --interval=45
 # - --debug
 # - --dry-run
 args: []
 
+# podAnnotations -- Additional annotations to add to the pod
 podAnnotations: {}
 
+# resources -- Pod resource requests and limits
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
@@ -38,8 +48,11 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+# nodeSelector -- Node labels for pod assignment
 nodeSelector: {}
 
+# tolerations -- List of node taints to tolerate
 tolerations: []
 
+# affinity -- Affinity for pod assignment
 affinity: {}

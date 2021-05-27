@@ -63,7 +63,9 @@ Use `make build` to build locally and test. Note that because `spark-nanny` issu
 
 To release a new version of `spark-nanny` do the following:
 
-1. Increment the `TAG` variable in the `Makefile`
-2. Run `make push-image`
-3. Update the `appVersion` field in `charts/spark-nanny/chart.yaml`
-4. Deploy the updated version
+1. Create and push a new version tag (e.g. `0.0.8`)
+2. Docker hub auto build will build a new version of the with the same tag
+3. Increment the `appVersion` and `version` in `charts/spark-nanny/chart.yaml`
+4. Merge the changes to `main` branch
+
+In case `values` have changed, run `make helm-docs` to regenerate the chart's `README` file
