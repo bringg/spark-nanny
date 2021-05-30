@@ -1,4 +1,7 @@
 # spark-nanny
+[![Go Report Card](https://goreportcard.com/badge/github.com/bringg/spark-nanny)](https://goreportcard.com/report/github.com/bringg/spark-nanny)
+[![license](https://img.shields.io/github/license/bringg/spark-nanny.svg)](https://github.com/bringg/spark-nanny/blob/master/LICENSE)
+[![Docker Image Version (latest semver)](https://img.shields.io/docker/v/bringg/spark-nanny?color=blue&sort=semver)](https://hub.docker.com/repository/docker/bringg/spark-nanny)
 
 Who watches the watchers?
 
