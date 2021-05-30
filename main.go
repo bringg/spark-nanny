@@ -15,6 +15,7 @@ import (
 var (
 	version   = "dev"
 	buildDate = "unknown"
+	commit    = "dirty"
 )
 
 func main() {
@@ -27,7 +28,7 @@ func main() {
 
 	flag.Parse()
 
-	log.Info().Msgf("starting spark-nanny, version: %s, build date: %s", version, buildDate)
+	log.Info().Msgf("starting spark-nanny, version: %s, build date: %s, git commit: %s", version, buildDate, commit)
 
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	if *debug {
@@ -69,5 +70,6 @@ func main() {
 		}
 	}
 
+	log.Info().Msg("watching...")
 	s.StartBlocking()
 }

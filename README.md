@@ -20,7 +20,7 @@ The simplest way to install `spark-nanny` is to use the provided chart:
 # First, add the spark-nanny repo
 $ helm repo add bringg-spark-nanny https://bringg.github.io/spark-nanny
 
-$ helm install spark-nanny -namespace spark bringg-spark-nanny/spark-nanny -set sparkApps="spark-app1\,spark-app2"
+$ helm install spark-nanny --namespace spark bringg-spark-nanny/spark-nanny --set sparkApps="spark-app1\,spark-app2"
 ```
 
 Note that the comma must be escaped (with `\`)
@@ -45,7 +45,7 @@ See the chart's `README` file for more details and possible configuration option
 `spark-nanny` does the following for each `spark` app passed via the `--apps` flag:
 1. Get the pod ip from the kubernetes api server
 2. Make sure the pod isn't in terminating phase, all containers are in `running` state and have been running for at least 60 seconds
-3. Issue a `GET` request on the driver application endpoint `http://it<pod-ip>:4040/api/v1/applications`
+3. Issue a `GET` request on the driver application endpoint `http://<pod-ip>:4040/api/v1/applications`
 4. If the request times out, the connection is refused or a non 200 status code is returned, retry 2 more times
 5. If after 3 retries the driver pod still doesn't return a 200 status code, delete the pod
 6. Rinse and repeat for every interval period defined
@@ -66,8 +66,7 @@ Use `make build` to build locally and test. Note that because `spark-nanny` issu
 
 To release a new version of `spark-nanny` do the following:
 
-1. Create and push a new version tag (e.g. `0.0.8`)
-2. Docker hub auto build will build a new version of the with the same tag
+1. Create and push a new version tag (e.g. `0.0.8`), docker hub auto build will build a new version of the with the same tag
 3. Increment the `appVersion` and `version` in `charts/spark-nanny/chart.yaml`
 4. Merge the changes to `main` branch
 

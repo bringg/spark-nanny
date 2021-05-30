@@ -1,10 +1,10 @@
 export GO111MODULE=on
 export CGO_ENABLED=0
 
-TAG=0.0.5
-BINARY=spark-nanny
-BUILD=`date +%FT%T%z`
-REPO=bringg
+BINARY			=spark-nanny
+VERSION			?=$(shell git rev-parse --abbrev-ref HEAD)
+BUILD				?=$(shell date +%FT%T)
+GIT_COMMIT 	?=$(shell git rev-parse HEAD)
 
 lint:
 	@echo "==> linting..."
@@ -12,7 +12,11 @@ lint:
 
 build: lint
 	@echo "==> building..."
-	@go build -ldflags="-s -w -X main.version=${TAG} -X main.buildDate=${BUILD}" -o bin/${BINARY} .
+	@go build -ldflags="-s -w \
+							-X main.version=${VERSION} \
+							-X main.buildDate=${BUILD} \
+							-X main.commit=${GIT_COMMIT}" \
+						-o ./bin/${BINARY} .
 
 download:
 	@echo "==> downloading dependencies..."

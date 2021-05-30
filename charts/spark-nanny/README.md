@@ -2,6 +2,8 @@
 
 A simple app to monitor spark app driver pods and restart them in case of failure
 
+![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-informational?style=flat-square) ![AppVersion: 0.0.6](https://img.shields.io/badge/AppVersion-0.0.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+
 ## Prerequisites
 
 - Helm >= 3
@@ -13,13 +15,13 @@ A simple app to monitor spark app driver pods and restart them in case of failur
 
 $ helm repo add bringg-spark-nanny https://bringg.github.io/spark-nanny
 
-$ helm install spark-nanny bringg-spark-nanny/spark-nanny -set sparkApps="spark-app1\,spark-app2"
+$ helm install spark-nanny bringg-spark-nanny/spark-nanny
 ```
 
 This will create a release of `spark-nanny` in the default namespace. To install in a different one:
 
 ```shell
-$ helm install -n spark my-release bringg-spark-nanny/spark-nanny -set sparkApps="spark-app1\,spark-app2"
+$ helm install -n spark my-release bringg-spark-nanny/spark-nanny
 ```
 
 Note that `helm` will fail to install if the namespace doesn't exist. Either create the namespace beforehand or pass the `--create-namespace` flag to the `helm install` command.
