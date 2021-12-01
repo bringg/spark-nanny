@@ -2,14 +2,14 @@ package main
 
 import (
 	"flag"
-	"strings"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/go-co-op/gocron"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 var (
@@ -25,6 +25,7 @@ func main() {
 	timeout := flag.Int("timeout", 10, "network timeout in seconds")
 	dryRun := flag.Bool("dry-run", false, "prefroms all the checks and logic, but won't actually delete the driver pod in case of failure")
 	namespace := flag.String("namespace", "spark", "spark apps namespace")
+	webListenAddress := flag.String("listen-address", ":9164", "Address to listen on for web interface and telemetry")
 
 	flag.Parse()
 
@@ -39,37 +40,35 @@ func main() {
 		log.Fatal().Msg("no spark apps to watch were defined")
 	}
 
-	log.Info().Msg("loading kubeconfig")
-
-	cfg, err := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		clientcmd.NewDefaultClientConfigLoadingRules(),
-		&clientcmd.ConfigOverrides{},
-	).ClientConfig()
-	if err != nil {
-		log.Fatal().Err(err).Msg("")
-	}
-
-	log.Info().Msg("creating kubernetes clientset")
-
-	clientset, err := kubernetes.NewForConfig(cfg)
-	if err != nil {
-		log.Fatal().Err(err).Msg("")
-	}
-
 	log.Info().Msg("starting job scheduler")
-
 	s := gocron.NewScheduler(time.UTC)
 
 	log.Info().Msg("registering nannies")
-	for _, a := range strings.Split(*apps, ",") {
-		nanny := newNanny(a, *namespace, *timeout, clientset, *dryRun)
+	opts := nannyOpts{*dryRun, *interval, *namespace, *timeout}
 
-		_, err := s.Every(*interval).Seconds().SingletonMode().Do(nanny.poke)
-		if err != nil {
-			log.Fatal().Err(err).Msg("failed to register job")
-		}
+	if err := registerNannies(s, *apps, opts); err != nil {
+		log.Fatal().Err(err).Msg("failed to register nanny")
 	}
 
-	log.Info().Msg("watching...")
-	s.StartBlocking()
+	// start the scheduler asynchronously
+	log.Info().Msgf("watching spark apps: %s", *apps)
+	s.StartAsync()
+
+	// setup a simple web server to expose health checks
+	log.Info().Msgf("starting server on %s", *webListenAddress)
+	ws := newServer(*webListenAddress)
+	ws.startAsync()
+
+	// channel to gracefully shutdown the job scheduler and server
+	sigint := make(chan os.Signal, 1)
+	signal.Notify(sigint, os.Interrupt, syscall.SIGTERM)
+
+	<-sigint
+
+	log.Info().Msg("stopping job scheduler")
+	s.Clear()
+	s.Stop()
+
+	log.Info().Msg("stopping server")
+	ws.stop()
 }

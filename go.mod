@@ -6,6 +6,7 @@ require (
 	github.com/go-co-op/gocron v1.10.0
 	github.com/golangci/golangci-lint v1.43.0
 	github.com/rs/zerolog v1.26.0
+	k8s.io/api v0.22.4
 	k8s.io/apimachinery v0.22.4
 	k8s.io/client-go v0.22.4
 )
@@ -165,7 +166,6 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	honnef.co/go/tools v0.2.1 // indirect
-	k8s.io/api v0.22.4 // indirect
 	k8s.io/klog/v2 v2.30.0 // indirect
 	k8s.io/utils v0.0.0-20211116205334-6203023598ed // indirect
 	mvdan.cc/gofumpt v0.1.1 // indirect
