@@ -32,7 +32,7 @@ func newServer(webListenAddress string) *server {
 // startAsync starts the server asynchronously
 func (s *server) startAsync() {
 	go func() {
-		if err := s.srv.ListenAndServe(); errors.Is(err, http.ErrServerClosed) {
+		if err := s.srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 			log.Fatal().Err(err).Msg("server failed")
 		}
 	}()
