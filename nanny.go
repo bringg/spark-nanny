@@ -1,17 +1,15 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
+	"github.com/go-co-op/gocron"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 )
 
 const (
@@ -19,38 +17,61 @@ const (
 	initialDelay int = 60
 )
 
+// nanny watchs a spark application and kills the driver pod
+// if the application is unresponsive
 type nanny struct {
-	appName   string
-	clientset *kubernetes.Clientset
+	app       string
 	dryRun    bool
 	logger    zerolog.Logger
 	namespace string
-	netClient *http.Client
+
+	kc *kubeClient
+	nc *http.Client
 }
 
-func newNanny(appName, namespace string, timeout int, clientset *kubernetes.Clientset, dryRun bool) *nanny {
-	// normalize the appName, change to lowercase, trim spaces and replace '_' with '-'
-	appName = strings.TrimSpace(strings.ReplaceAll(strings.ToLower(appName), "_", "-"))
+// nannyOpts controls the nannies behavior
+// note that the options are shared across all nannies
+type nannyOpts struct {
+	dryRun    bool
+	interval  int
+	namespace string
+	timeout   int
+}
 
-	n := &nanny{
-		appName:   appName,
-		namespace: namespace,
-		// add some contextual fields to the log to better understand what's happening
-		logger:    log.With().Str("spark-application", appName).Logger(),
-		clientset: clientset,
-		netClient: &http.Client{
-			Timeout: time.Duration(timeout) * time.Second,
-		},
-		dryRun: dryRun,
+// registerNannies creates a new nanny for each app and registers it with
+// the gocron scheduler
+func registerNannies(s *gocron.Scheduler, apps string, opts nannyOpts) error {
+	kubeClient := newKubeClient()
+	netClient := &http.Client{
+		Timeout: time.Duration(opts.timeout) * time.Second,
 	}
 
-	n.logger.Debug().Msgf("creating nanny with the following config: name %s, namespace %s, timout %d", appName, namespace, timeout)
+	for _, app := range strings.Split(apps, ",") {
+		// normalize app name
+		app = strings.TrimSpace(strings.ReplaceAll(strings.ToLower(app), "_", "-"))
 
-	return n
+		n := &nanny{
+			app:       app,
+			namespace: opts.namespace,
+			logger:    log.With().Str("spark-application", app).Logger(),
+			dryRun:    opts.dryRun,
+			kc:        kubeClient,
+			nc:        netClient,
+		}
+
+		n.logger.Debug().Msgf("creating nanny with the following config: spark app %s/%s, timout %ds", opts.namespace, app, opts.timeout)
+
+		if _, err := s.Every(opts.interval).Seconds().SingletonMode().Do(n.poke); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
+// poke checks the spark application responsiveness
 func (n *nanny) poke() {
-	pod, err := n.clientset.CoreV1().Pods(n.namespace).Get(context.TODO(), fmt.Sprintf("%s-driver", n.appName), v1.GetOptions{})
+	pod, err := n.kc.getDriverPod(n.app, n.namespace)
 	if err != nil {
 		n.logger.Warn().Err(err).Msg("")
 		return
@@ -85,8 +106,7 @@ func (n *nanny) poke() {
 
 	for i := 1; i <= maxRetries; i++ {
 		n.logger.Debug().Msgf("pinging %s (retry %d/%d)", endpoint, i, maxRetries)
-		res, err := n.netClient.Get(endpoint)
-
+		res, err := n.nc.Get(endpoint)
 		if err != nil {
 			n.logger.Warn().Err(err).Msg("")
 			n.logger.Debug().Msgf("got error with type %T", err)
@@ -128,11 +148,12 @@ func (n *nanny) poke() {
 	n.kill()
 }
 
+// kill deletes the driver pod
 func (n *nanny) kill() {
 	n.logger.Info().Msg("going to delete driver pod")
 
 	if !n.dryRun {
-		if err := n.clientset.CoreV1().Pods(n.namespace).Delete(context.TODO(), fmt.Sprintf("%s-driver", n.appName), v1.DeleteOptions{}); err != nil {
+		if err := n.kc.deleteDriverPod(n.app, n.namespace); err != nil {
 			n.logger.Error().Err(err).Msg("failed to delete driver pod")
 		}
 	}
