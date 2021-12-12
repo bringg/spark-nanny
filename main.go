@@ -30,6 +30,7 @@ func main() {
 	flag.Parse()
 
 	log.Info().Msgf("starting spark-nanny, version: %s, build date: %s, git commit: %s", version, buildDate, commit)
+	buildInfo.Set(1)
 
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	if *debug {

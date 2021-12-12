@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/go-co-op/gocron v1.10.0
 	github.com/golangci/golangci-lint v1.43.0
+	github.com/prometheus/client_golang v1.7.1
 	github.com/rs/zerolog v1.26.0
 	k8s.io/api v0.22.4
 	k8s.io/apimachinery v0.22.4
@@ -113,7 +114,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/polyfloyd/go-errorlint v0.0.0-20210722154253-910bb7978349 // indirect
-	github.com/prometheus/client_golang v1.7.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.10.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect

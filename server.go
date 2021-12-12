@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog/log"
 )
 
@@ -25,6 +26,7 @@ func newServer(webListenAddress string) *server {
 	}
 
 	mux.HandleFunc("/healthz", s.healthz)
+	mux.Handle("/metrics", promhttp.Handler())
 
 	return s
 }

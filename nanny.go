@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-co-op/gocron"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -71,6 +72,9 @@ func registerNannies(s *gocron.Scheduler, apps string, opts nannyOpts) error {
 
 // poke checks the spark application responsiveness
 func (n *nanny) poke() {
+	timer := prometheus.NewTimer(pokeDuration.WithLabelValues(n.app))
+	defer timer.ObserveDuration()
+
 	pod, err := n.kc.getDriverPod(n.app, n.namespace)
 	if err != nil {
 		n.logger.Warn().Err(err).Msg("")
@@ -156,5 +160,7 @@ func (n *nanny) kill() {
 		if err := n.kc.deleteDriverPod(n.app, n.namespace); err != nil {
 			n.logger.Error().Err(err).Msg("failed to delete driver pod")
 		}
+
+		killCount.WithLabelValues(n.app).Inc()
 	}
 }
