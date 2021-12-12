@@ -26,6 +26,9 @@ serviceAccount:
 # -- Comma separated list of spark apps to watch, e.g. spark-app1,spark-app2. Required
 sparkApps: ""
 
+# -- Listen port for health checks and metrics, change this if you're changing the `listen-address` argument
+listenPort: 9164
+
 # -- List of additional args to pass, e.g.
 # - --interval=45
 # - --debug

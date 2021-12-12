@@ -33,6 +33,14 @@ spec:
           {{- with .Values.args}}
           {{ toYaml . | nindent 10 }}
           {{- end }}
+          ports:
+          - name: http
+            containerPort: {{ .Values.listenPort }}
+            protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

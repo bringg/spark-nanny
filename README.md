@@ -28,7 +28,7 @@ $ helm install spark-nanny --namespace spark bringg-spark-nanny/spark-nanny --se
 
 Note that the comma must be escaped (with `\`)
 
-See the chart's `README` file for more details and possible configuration options
+See the chart's [readme](https://github.com/bringg/spark-nanny/blob/main/charts/spark-nanny/README.md) for more details and possible configuration options
 
 ## Configuration
 
@@ -42,6 +42,7 @@ See the chart's `README` file for more details and possible configuration option
 | `namespace` | `spark` | `spark` apps namespace |
 | `dry-run` | `false` | preforms all the checks and logic, but won't actually delete the pod |
 | `debug` | `false` | set to `true` to enable more verbose logging |
+| `listen-address` | `:9164` | address to listen on for health checks and metrics |
 
 ## How it Works
 
@@ -54,6 +55,15 @@ See the chart's `README` file for more details and possible configuration option
 6. Rinse and repeat for every interval period defined
 
 Once the driver pod is deleted, any executors owned by it will also be deleted and the `spark` app will be rescheduled be the operator
+
+## Metrics
+
+Starting from `v0.2.0`, `spark-nanny` exposes some metrics about it's operations:
+
+* `spark_nanny_poke_duration_seconds` - histogram metric with the `poke` operation duration for each watched `spark app`
+* `spark_nanny_kill_count` - counter metric with the number of times a `spark app` was killed by `spark_nanny`
+
+Metrics are available on the `listen-address` (default `:9164`) at the `/metrics` path
 
 ## Development
 
