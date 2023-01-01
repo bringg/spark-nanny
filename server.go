@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog/log"
@@ -20,8 +21,9 @@ func newServer(webListenAddress string) *server {
 
 	s := &server{
 		srv: &http.Server{
-			Addr:    webListenAddress,
-			Handler: mux,
+			Addr:        webListenAddress,
+			Handler:     mux,
+			ReadTimeout: 2 * time.Second,
 		},
 	}
 

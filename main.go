@@ -23,7 +23,7 @@ func main() {
 	debug := flag.Bool("debug", false, "set log level to debug")
 	interval := flag.Int("interval", 30, "interval between health checks in seconds")
 	timeout := flag.Int("timeout", 10, "network timeout in seconds")
-	dryRun := flag.Bool("dry-run", false, "prefroms all the checks and logic, but won't actually delete the driver pod in case of failure")
+	dryRun := flag.Bool("dry-run", false, "preforms all the checks and logic, but won't actually delete the driver pod in case of failure")
 	namespace := flag.String("namespace", "spark", "spark apps namespace")
 	webListenAddress := flag.String("listen-address", ":9164", "Address to listen on for web interface and telemetry")
 
@@ -67,7 +67,6 @@ func main() {
 	<-sigint
 
 	log.Info().Msg("stopping job scheduler")
-	s.Clear()
 	s.Stop()
 
 	log.Info().Msg("stopping server")
