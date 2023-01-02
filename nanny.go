@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -18,7 +19,7 @@ const (
 	initialDelay int = 60
 )
 
-// nanny watchs a spark application and kills the driver pod
+// nanny watches a spark application and kills the driver pod
 // if the application is unresponsive
 type nanny struct {
 	app       string
@@ -60,7 +61,7 @@ func registerNannies(s *gocron.Scheduler, apps string, opts nannyOpts) error {
 			nc:        netClient,
 		}
 
-		n.logger.Debug().Msgf("creating nanny with the following config: spark app %s/%s, timout %ds", opts.namespace, app, opts.timeout)
+		n.logger.Debug().Msgf("creating nanny with the following config: spark app %s/%s, timeout %ds", opts.namespace, app, opts.timeout)
 
 		if _, err := s.Every(opts.interval).Seconds().SingletonMode().Do(n.poke); err != nil {
 			return err
@@ -110,32 +111,35 @@ func (n *nanny) poke() {
 
 	for i := 1; i <= maxRetries; i++ {
 		n.logger.Debug().Msgf("pinging %s (retry %d/%d)", endpoint, i, maxRetries)
+
 		res, err := n.nc.Get(endpoint)
 		if err != nil {
 			n.logger.Warn().Err(err).Msg("")
 			n.logger.Debug().Msgf("got error with type %T", err)
-			switch e := err.(type) {
-			case *url.Error:
-				// if it's a timout or connection refused error, we skip to the next
+
+			var uerr *url.Error
+
+			if errors.As(err, &uerr) {
+				// if it's a timeout or connection refused error, we skip to the next
 				// loop iteration
-				if e.Timeout() {
+				if uerr.Timeout() {
 					n.logger.Debug().Msg("got timeout")
 					continue
 				}
-				if strings.Contains(e.Err.Error(), "connection refused") {
+
+				if strings.Contains(uerr.Unwrap().Error(), "connection refused") {
 					n.logger.Debug().Msg("got connection refused")
 					continue
 				}
-				// if it's some other type of error return so we don't kill
-				// the pod on some network related issue
-				return
-			default:
-				n.logger.Debug().Msg("will not retry")
-				return
 			}
+
+			// if it's some other type of error return so we don't kill
+			// the pod on some network related issue
+			n.logger.Debug().Msg("will not retry")
+			return
 		}
 
-		defer res.Body.Close()
+		defer res.Body.Close() //nolint: errcheck
 
 		// happy path
 		if res.StatusCode == http.StatusOK {
@@ -156,11 +160,15 @@ func (n *nanny) poke() {
 func (n *nanny) kill() {
 	n.logger.Info().Msg("going to delete driver pod")
 
-	if !n.dryRun {
-		if err := n.kc.deleteDriverPod(n.app, n.namespace); err != nil {
-			n.logger.Error().Err(err).Msg("failed to delete driver pod")
-		}
-
-		killCount.WithLabelValues(n.app).Inc()
+	if n.dryRun {
+		n.logger.Debug().Msgf("running in dry-run mode, would have killed %s/%s", n.namespace, n.app)
+		return
 	}
+
+	if err := n.kc.deleteDriverPod(n.app, n.namespace); err != nil {
+		n.logger.Error().Err(err).Msg("failed to delete driver pod")
+	}
+
+	// increment the kill counter metric
+	killCount.WithLabelValues(n.app).Inc()
 }
