@@ -2,7 +2,7 @@
 
 A simple app to monitor spark app driver pods and restart them in case of failure
 
-![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![AppVersion: v0.2.0](https://img.shields.io/badge/AppVersion-v0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square) ![AppVersion: v0.2.1](https://img.shields.io/badge/AppVersion-v0.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Prerequisites
 
@@ -60,4 +60,4 @@ The command removes all the Kubernetes components associated with the chart and 
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| Bringg DevOps | devops@bringg.com |  |
+| Bringg DevOps | <devops@bringg.com> |  |
