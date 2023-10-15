@@ -2,6 +2,22 @@ apiVersion: v1
 entries:
   spark-nanny:
   - apiVersion: v2
+    appVersion: v0.2.1
+    created: "2023-10-15T10:24:29.900034812Z"
+    description: A simple app to monitor spark app driver pods and restart them in
+      case of failure
+    digest: 248b9021a6199e6d94139c25a54c32c5ad6f55c354a1c0cf3f24714d4006dee7
+    maintainers:
+    - email: devops@bringg.com
+      name: Bringg DevOps
+    name: spark-nanny
+    sources:
+    - https://github.com/bringg/spark-nanny
+    type: application
+    urls:
+    - https://github.com/bringg/spark-nanny/releases/download/spark-nanny-0.3.1/spark-nanny-0.3.1.tgz
+    version: 0.3.1
+  - apiVersion: v2
     appVersion: v0.2.0
     created: "2021-12-12T13:58:29.195051602Z"
     description: A simple app to monitor spark app driver pods and restart them in
@@ -65,4 +81,4 @@ entries:
     urls:
     - https://github.com/bringg/spark-nanny/releases/download/spark-nanny-0.1.1/spark-nanny-0.1.1.tgz
     version: 0.1.1
-generated: "2021-12-12T13:58:29.195076903Z"
+generated: "2023-10-15T10:24:29.900062512Z"
